@@ -33,6 +33,7 @@ important in operations research and theoretical computer science.
 
 http://en.wikipedia.org/wiki/Travelling_salesman_problem
 """
+
 import math
 
 import networkx as nx
@@ -186,13 +187,18 @@ def christofides(G, weight="weight", tree=None):
 
 def _shortcutting(circuit):
     """Remove duplicate nodes in the path"""
+    nodes_set = set()
     nodes = []
+
     for u, v in circuit:
-        if v in nodes:
+        if v in nodes_set:
             continue
         if not nodes:
             nodes.append(u)
+            nodes_set.add(u)
         nodes.append(v)
+        nodes_set.add(v)
+
     nodes.append(nodes[0])
     return nodes
 
