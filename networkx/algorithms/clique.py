@@ -7,6 +7,7 @@ see the Wikipedia article on the clique problem [1]_.
 .. [1] clique problem:: https://en.wikipedia.org/wiki/Clique_problem
 
 """
+
 from collections import defaultdict, deque
 from itertools import chain, combinations, islice
 
@@ -649,21 +650,21 @@ class MaxWeightClique:
             self.incumbent_weight = C_weight
 
     def greedily_find_independent_set(self, P):
-        """Greedily find an independent set of nodes from a set of
-        nodes P."""
+        """Greedily find an independent set of nodes from a set of nodes P."""
         independent_set = []
-        P = P[:]
+        P = set(P)
         while P:
-            v = P[0]
+            v = next(iter(P))
             independent_set.append(v)
-            P = [w for w in P if v != w and not self.G.has_edge(v, w)]
+            P -= {w for w in self.G.neighbors(v)}
+            P.discard(v)
         return independent_set
 
     def find_branching_nodes(self, P, target):
         """Find a set of nodes to branch on."""
         residual_wt = {v: self.node_weights[v] for v in P}
         total_wt = 0
-        P = P[:]
+        P = set(P)
         while P:
             independent_set = self.greedily_find_independent_set(P)
             min_wt_in_class = min(residual_wt[v] for v in independent_set)
@@ -672,8 +673,9 @@ class MaxWeightClique:
                 break
             for v in independent_set:
                 residual_wt[v] -= min_wt_in_class
-            P = [v for v in P if residual_wt[v] != 0]
-        return P
+                if residual_wt[v] == 0:
+                    P.remove(v)
+        return list(P)
 
     def expand(self, C, C_weight, P):
         """Look for the best clique that contains all the nodes in C and zero or
