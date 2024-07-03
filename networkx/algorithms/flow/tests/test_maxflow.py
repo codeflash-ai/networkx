@@ -1,5 +1,6 @@
 """Maximum flow algorithms test suite.
 """
+
 import pytest
 
 import networkx as nx
@@ -29,9 +30,10 @@ all_funcs = flow_funcs & interface_funcs
 
 def compute_cutset(G, partition):
     reachable, non_reachable = partition
+    non_reachable_set = set(non_reachable)
     cutset = set()
-    for u, nbrs in ((n, G[n]) for n in reachable):
-        cutset.update((u, v) for v in nbrs if v in non_reachable)
+    for u in reachable:
+        cutset.update((u, v) for v in G[u] if v in non_reachable_set)
     return cutset
 
 
