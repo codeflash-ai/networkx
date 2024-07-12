@@ -96,11 +96,12 @@ def is_tournament(G):
     the convention used here.
 
     """
+    # Check if there are any self-loops first as it can be computationally cheaper
+    if any(G.has_edge(n, n) for n in G.nodes):
+        return False
+
     # In a tournament, there is exactly one directed edge joining each pair.
-    return (
-        all((v in G[u]) ^ (u in G[v]) for u, v in combinations(G, 2))
-        and nx.number_of_selfloops(G) == 0
-    )
+    return all((G.has_edge(u, v) ^ G.has_edge(v, u)) for u, v in combinations(G, 2))
 
 
 @not_implemented_for("undirected")
