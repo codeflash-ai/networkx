@@ -213,7 +213,9 @@ def score_sequence(G):
     [1, 1, 2, 2]
 
     """
-    return sorted(d for v, d in G.out_degree())
+    out_degrees = [d for _, d in G.out_degree()]
+    out_degrees.sort()
+    return out_degrees
 
 
 @not_implemented_for("undirected")
