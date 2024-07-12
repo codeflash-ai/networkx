@@ -52,8 +52,16 @@ def moral_graph(G):
            In Proceedings of the Eleventh conference on Uncertainty
            in artificial intelligence (UAI'95)
     """
-    H = G.to_undirected()
-    for preds in G.pred.values():
+    H = nx.Graph()
+    H.add_nodes_from(G.nodes)
+
+    # Add all original edges as undirected edges
+    for u, v in G.edges:
+        H.add_edge(u, v)
+
+    # Connect parents of each node
+    for node, preds in G.pred.items():
         predecessors_combinations = itertools.combinations(preds, r=2)
         H.add_edges_from(predecessors_combinations)
+
     return H
