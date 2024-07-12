@@ -8,13 +8,9 @@ from networkx import convert
 from networkx.classes.coreviews import MultiAdjacencyView
 from networkx.classes.digraph import DiGraph
 from networkx.classes.multigraph import MultiGraph
-from networkx.classes.reportviews import (
-    DiMultiDegreeView,
-    InMultiDegreeView,
-    InMultiEdgeView,
-    OutMultiDegreeView,
-    OutMultiEdgeView,
-)
+from networkx.classes.reportviews import (DiMultiDegreeView, InMultiDegreeView,
+                                          InMultiEdgeView, OutMultiDegreeView,
+                                          OutMultiEdgeView)
 from networkx.exception import NetworkXError
 
 __all__ = ["MultiDiGraph"]
