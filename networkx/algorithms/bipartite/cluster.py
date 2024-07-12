@@ -13,7 +13,9 @@ __all__ = [
 
 
 def cc_dot(nu, nv):
-    return len(nu & nv) / len(nu | nv)
+    intersection_len = len(nu & nv)
+    union_len = len(nu) + len(nv) - intersection_len
+    return intersection_len / union_len
 
 
 def cc_max(nu, nv):
