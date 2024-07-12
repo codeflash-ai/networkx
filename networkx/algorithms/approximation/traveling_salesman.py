@@ -188,12 +188,17 @@ def christofides(G, weight="weight", tree=None):
 def _shortcutting(circuit):
     """Remove duplicate nodes in the path"""
     nodes = []
+    seen = set()
+
     for u, v in circuit:
-        if v in nodes:
+        if v in seen:
             continue
         if not nodes:
             nodes.append(u)
+            seen.add(u)
         nodes.append(v)
+        seen.add(v)
+
     nodes.append(nodes[0])
     return nodes
 
