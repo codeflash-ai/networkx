@@ -203,72 +203,36 @@ def balanced_tree(r, h, create_using=None):
 
 @nx._dispatchable(graphs=None, returns_graph=True)
 def barbell_graph(m1, m2, create_using=None):
-    """Returns the Barbell Graph: two complete graphs connected by a path.
-
-    .. plot::
-
-        >>> nx.draw(nx.barbell_graph(4, 2))
-
-    Parameters
-    ----------
-    m1 : int
-        Size of the left and right barbells, must be greater than 2.
-
-    m2 : int
-        Length of the path connecting the barbells.
-
-    create_using : NetworkX graph constructor, optional (default=nx.Graph)
-       Graph type to create. If graph instance, then cleared before populated.
-       Only undirected Graphs are supported.
-
-    Returns
-    -------
-    G : NetworkX graph
-        A barbell graph.
-
-    Notes
-    -----
-
-
-    Two identical complete graphs $K_{m1}$ form the left and right bells,
-    and are connected by a path $P_{m2}$.
-
-    The `2*m1+m2`  nodes are numbered
-        `0, ..., m1-1` for the left barbell,
-        `m1, ..., m1+m2-1` for the path,
-        and `m1+m2, ..., 2*m1+m2-1` for the right barbell.
-
-    The 3 subgraphs are joined via the edges `(m1-1, m1)` and
-    `(m1+m2-1, m1+m2)`. If `m2=0`, this is merely two complete
-    graphs joined together.
-
-    This graph is an extremal example in David Aldous
-    and Jim Fill's e-text on Random Walks on Graphs.
-
-    """
+    """Returns the Barbell Graph: two complete graphs connected by a path."""
     if m1 < 2:
         raise NetworkXError("Invalid graph description, m1 should be >=2")
     if m2 < 0:
         raise NetworkXError("Invalid graph description, m2 should be >=0")
 
-    # left barbell
-    G = complete_graph(m1, create_using)
-    if G.is_directed():
-        raise NetworkXError("Directed Graph not supported")
+    G = nx.empty_graph(create_using=create_using)
+    G.add_nodes_from(range(2 * m1 + m2))
 
-    # connecting path
-    G.add_nodes_from(range(m1, m1 + m2 - 1))
-    if m2 > 1:
-        G.add_edges_from(pairwise(range(m1, m1 + m2)))
-
-    # right barbell
-    G.add_edges_from(
-        (u, v) for u in range(m1 + m2, 2 * m1 + m2) for v in range(u + 1, 2 * m1 + m2)
-    )
-
-    # connect it up
-    G.add_edge(m1 - 1, m1)
-    if m2 > 0:
+    if m2 == 0:
+        left_edges = ((u, v) for u in range(m1) for v in range(u + 1, m1))
+        right_edges = ((u, v) for u in range(m1, 2 * m1) for v in range(u + 1, 2 * m1))
+        G.add_edges_from(left_edges)
+        G.add_edges_from(right_edges)
+        G.add_edge(m1 - 1, m1)
+    else:
+        barbell_edges = (
+            (u, v) for u in range(m1) for v in range(u + 1, m1)
+        )  # Left barbell
+        barbell_edges = itertools.chain(
+            barbell_edges,
+            (
+                (u, v)
+                for u in range(m1 + m2, 2 * m1 + m2)
+                for v in range(u + 1, 2 * m1 + m2)
+            ),  # Right barbell
+            pairwise(range(m1, m1 + m2)),  # The connecting path
+        )
+        G.add_edges_from(barbell_edges)
+        G.add_edge(m1 - 1, m1)
         G.add_edge(m1 + m2 - 1, m1 + m2)
 
     return G
@@ -315,42 +279,9 @@ def binomial_tree(n, create_using=None):
 @nx._dispatchable(graphs=None, returns_graph=True)
 @nodes_or_number(0)
 def complete_graph(n, create_using=None):
-    """Return the complete graph `K_n` with n nodes.
-
-    A complete graph on `n` nodes means that all pairs
-    of distinct nodes have an edge connecting them.
-
-    .. plot::
-
-        >>> nx.draw(nx.complete_graph(5))
-
-    Parameters
-    ----------
-    n : int or iterable container of nodes
-        If n is an integer, nodes are from range(n).
-        If n is a container of nodes, those nodes appear in the graph.
-        Warning: n is not checked for duplicates and if present the
-        resulting graph may not be as desired. Make sure you have no duplicates.
-    create_using : NetworkX graph constructor, optional (default=nx.Graph)
-       Graph type to create. If graph instance, then cleared before populated.
-
-    Examples
-    --------
-    >>> G = nx.complete_graph(9)
-    >>> len(G)
-    9
-    >>> G.size()
-    36
-    >>> G = nx.complete_graph(range(11, 14))
-    >>> list(G.nodes())
-    [11, 12, 13]
-    >>> G = nx.complete_graph(4, nx.DiGraph())
-    >>> G.is_directed()
-    True
-
-    """
+    """Return the complete graph `K_n` with n nodes."""
     _, nodes = n
-    G = empty_graph(nodes, create_using)
+    G = nx.empty_graph(nodes, create_using)
     if len(nodes) > 1:
         if G.is_directed():
             edges = itertools.permutations(nodes, 2)
