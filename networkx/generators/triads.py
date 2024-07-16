@@ -8,6 +8,7 @@ digraphs on three nodes.
 """
 
 import networkx as nx
+from networkx import DiGraph
 from networkx.classes import DiGraph
 
 __all__ = ["triad_graph"]
@@ -34,7 +35,6 @@ TRIAD_EDGES = {
 }
 
 
-@nx._dispatchable(graphs=None, returns_graph=True)
 def triad_graph(triad_name):
     """Returns the triad graph with the given name.
 
@@ -83,12 +83,14 @@ def triad_graph(triad_name):
     triadic_census
 
     """
-    if triad_name not in TRIAD_EDGES:
+    edges = TRIAD_EDGES.get(triad_name)
+    if edges is None:
         raise ValueError(
             f'unknown triad name "{triad_name}"; use one of the triad names'
             " in the TRIAD_NAMES constant"
         )
+
     G = DiGraph()
     G.add_nodes_from("abc")
-    G.add_edges_from(TRIAD_EDGES[triad_name])
+    G.add_edges_from(edges)
     return G
