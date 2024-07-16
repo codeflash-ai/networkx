@@ -1267,7 +1267,7 @@ def number_of_selfloops(G):
     >>> nx.number_of_selfloops(G)
     1
     """
-    return sum(1 for _ in nx.selfloop_edges(G))
+    return sum(1 for u, v in G.edges if u == v)
 
 
 def is_path(G, path):
