@@ -46,37 +46,32 @@ def attach(module_name, submodules=None, submod_attrs=None):
     __getattr__, __dir__, __all__
 
     """
-    if submod_attrs is None:
-        submod_attrs = {}
 
-    if submodules is None:
-        submodules = set()
-    else:
-        submodules = set(submodules)
+    submod_attrs = submod_attrs or {}
+    submodules = set(submodules or [])
 
     attr_to_modules = {
         attr: mod for mod, attrs in submod_attrs.items() for attr in attrs
     }
 
-    __all__ = list(submodules | attr_to_modules.keys())
+    __all__ = list(submodules) + list(attr_to_modules.keys())
 
     def __getattr__(name):
         if name in submodules:
             return importlib.import_module(f"{module_name}.{name}")
-        elif name in attr_to_modules:
+        if name in attr_to_modules:
             submod = importlib.import_module(f"{module_name}.{attr_to_modules[name]}")
             return getattr(submod, name)
-        else:
-            raise AttributeError(f"No {module_name} attribute {name}")
+        raise AttributeError(f"No {module_name} attribute {name}")
 
     def __dir__():
         return __all__
 
-    if os.environ.get("EAGER_IMPORT", ""):
-        for attr in set(attr_to_modules.keys()) | submodules:
+    if os.environ.get("EAGER_IMPORT"):
+        for attr in __all__:
             __getattr__(attr)
 
-    return __getattr__, __dir__, list(__all__)
+    return __getattr__, __dir__, __all__
 
 
 class DelayedImportErrorModule(types.ModuleType):
