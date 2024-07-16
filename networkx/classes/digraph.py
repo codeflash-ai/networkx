@@ -7,13 +7,9 @@ import networkx as nx
 from networkx import convert
 from networkx.classes.coreviews import AdjacencyView
 from networkx.classes.graph import Graph
-from networkx.classes.reportviews import (
-    DiDegreeView,
-    InDegreeView,
-    InEdgeView,
-    OutDegreeView,
-    OutEdgeView,
-)
+from networkx.classes.reportviews import (DiDegreeView, InDegreeView,
+                                          InEdgeView, OutDegreeView,
+                                          OutEdgeView)
 from networkx.exception import NetworkXError
 
 __all__ = ["DiGraph"]
