@@ -96,11 +96,17 @@ def is_tournament(G):
     the convention used here.
 
     """
-    # In a tournament, there is exactly one directed edge joining each pair.
-    return (
-        all((v in G[u]) ^ (u in G[v]) for u, v in combinations(G, 2))
-        and nx.number_of_selfloops(G) == 0
-    )
+    # Check if there are any self-loops directly
+    if any(u == v for u, v in G.edges):
+        return False
+
+    # Check if there is exactly one directed edge joining each pair
+    nodes = list(G)
+    for u, v in combinations(nodes, 2):
+        if not ((G.has_edge(u, v) ^ G.has_edge(v, u))):
+            return False
+
+    return True
 
 
 @not_implemented_for("undirected")
@@ -220,43 +226,9 @@ def score_sequence(G):
 @not_implemented_for("multigraph")
 @nx._dispatchable(preserve_edge_attrs={"G": {"weight": 1}})
 def tournament_matrix(G):
-    r"""Returns the tournament matrix for the given tournament graph.
-
-    This function requires SciPy.
-
-    The *tournament matrix* of a tournament graph with edge set *E* is
-    the matrix *T* defined by
-
-    .. math::
-
-       T_{i j} =
-       \begin{cases}
-       +1 & \text{if } (i, j) \in E \\
-       -1 & \text{if } (j, i) \in E \\
-       0 & \text{if } i == j.
-       \end{cases}
-
-    An equivalent definition is `T = A - A^T`, where *A* is the
-    adjacency matrix of the graph `G`.
-
-    Parameters
-    ----------
-    G : NetworkX graph
-        A directed graph representing a tournament.
-
-    Returns
-    -------
-    SciPy sparse array
-        The tournament matrix of the tournament graph `G`.
-
-    Raises
-    ------
-    ImportError
-        If SciPy is not available.
-
-    """
-    A = nx.adjacency_matrix(G)
-    return A - A.T
+    r"""Returns the tournament matrix for the given tournament graph."""
+    A = nx.to_scipy_sparse_array(G)
+    return A - A.transpose()
 
 
 @not_implemented_for("undirected")
